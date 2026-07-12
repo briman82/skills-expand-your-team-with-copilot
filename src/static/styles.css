@@ -187,7 +187,74 @@ section h3 {
   margin-top: auto;
   padding-top: 10px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Share button and popover */
+.share-button {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  align-self: flex-end;
+}
+
+.share-button:hover {
+  background-color: var(--background);
+  border-color: var(--border-focus);
+  color: var(--text-primary);
+}
+
+.share-popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 10;
+  min-width: 160px;
+}
+
+.share-popover-option {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.15s ease;
+  width: 100%;
+}
+
+.share-popover-option:hover {
+  background-color: var(--background);
+}
+
+.share-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-top: 8px;
+  align-self: flex-end;
 }
 
 /* Activity Tag */
