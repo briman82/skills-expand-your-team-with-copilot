@@ -553,6 +553,11 @@ document.addEventListener("DOMContentLoaded", () => {
         </ul>
       </div>
       <div class="activity-card-actions">
+        <div class="share-wrapper">
+          <button class="share-button" aria-label="Share activity">
+            🔗 Share
+          </button>
+        </div>
         ${
           currentUser
             ? `
@@ -586,6 +591,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // Add click handler for share button
+    const shareBtn = activityCard.querySelector(".share-button");
+    shareBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      shareActivity(name, details, shareBtn);
+    });
 
     activitiesList.appendChild(activityCard);
   }
@@ -797,6 +809,72 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     );
+  }
+
+  // Share activity using Web Share API or fallback popover
+  function shareActivity(name, details, triggerButton) {
+    const shareText = `Check out this activity: ${name} — ${details.description}`;
+    const shareUrl = window.location.href;
+
+    // Close any other open share popovers
+    document.querySelectorAll(".share-popover").forEach((p) => p.remove());
+
+    // Use native Web Share API if available (works on mobile and some desktop browsers)
+    if (navigator.share) {
+      navigator
+        .share({ title: name, text: shareText, url: shareUrl })
+        .catch(() => {
+          // User cancelled or share failed, do nothing
+        });
+      return;
+    }
+
+    // Fallback: show a small popover with share options
+    const wrapper = triggerButton.closest(".share-wrapper");
+    const popover = document.createElement("div");
+    popover.className = "share-popover";
+
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + " " + shareUrl)}`;
+
+    popover.innerHTML = `
+      <button class="share-popover-option" data-action="twitter">🐦 Share on X (Twitter)</button>
+      <button class="share-popover-option" data-action="whatsapp">💬 Share on WhatsApp</button>
+      <button class="share-popover-option" data-action="copy">📋 Copy Link</button>
+    `;
+
+    wrapper.appendChild(popover);
+
+    popover.querySelector("[data-action='twitter']").addEventListener("click", () => {
+      window.open(twitterUrl, "_blank", "noopener,noreferrer");
+      popover.remove();
+    });
+
+    popover.querySelector("[data-action='whatsapp']").addEventListener("click", () => {
+      window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+      popover.remove();
+    });
+
+    popover.querySelector("[data-action='copy']").addEventListener("click", () => {
+      navigator.clipboard
+        .writeText(shareUrl)
+        .then(() => {
+          showMessage("Link copied to clipboard!", "success");
+        })
+        .catch(() => {
+          showMessage("Could not copy link. Please copy it manually.", "error");
+        });
+      popover.remove();
+    });
+
+    // Close the popover when clicking outside
+    const closePopover = (event) => {
+      if (!wrapper.contains(event.target)) {
+        popover.remove();
+        document.removeEventListener("click", closePopover);
+      }
+    };
+    setTimeout(() => document.addEventListener("click", closePopover), 0);
   }
 
   // Show message function
